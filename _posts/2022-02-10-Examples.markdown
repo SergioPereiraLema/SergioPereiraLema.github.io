@@ -130,7 +130,11 @@ This is [Mr. Green Jekyll Theme](https://github.com/MrGreensWorkshop/MrGreen-Jek
 
 1. Fruits
    1. Apples
-      - Granny Smith
+      - Granny Smith# Show basic information from SIMBAD
+row = result[0]
+ra = row['ra']
+dec = row['dec']
+radius = row['galdim_majaxis']/2
       - Mutsu
    1. Bananas
       - Cavendish

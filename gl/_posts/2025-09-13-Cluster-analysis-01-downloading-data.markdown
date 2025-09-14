@@ -1,7 +1,7 @@
 ---
 # multilingual page pair id, this must pair with translations of this page. (This name must be unique)
 lng_pair: id_blog_1
-title: _conectando-e-descargando-datos-de-gaia_
+title: Conectando e descargando datos de gaia
 
 # post specific
 # if not specified, .name will be used from _data/owner/[language].yml
@@ -11,7 +11,7 @@ category: cluster
 # multiple tag entries are possible
 tags: [cluster, connection]
 # thumbnail image for post
-img: ":post_pic2.jpg"
+img: ":post_pic1.png"
 # disable comments on this page
 comments_disable: true
 

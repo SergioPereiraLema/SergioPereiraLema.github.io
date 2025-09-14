@@ -1,7 +1,7 @@
 ---
 # multilingual page pair id, this must pair with translations of this page. (This name must be unique)
 lng_pair: id_blog_1
-title: _conectando-y-descargando-datos-de-gaia_
+title: Conectando y descargando datos de Gaia
 
 # post specific
 # if not specified, .name will be used from _data/owner/[language].yml

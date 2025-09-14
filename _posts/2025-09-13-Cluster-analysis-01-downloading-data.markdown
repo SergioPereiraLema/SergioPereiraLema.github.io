@@ -197,6 +197,7 @@ We can run the notebook for different objects based on their name.
 
 That concludes this first entry, which is very simple and serves as an introduction to retrieving data from objects in the Gaia DR3 database.
 
-In future entries, we will redo this notebook in a more structured way.
+In future entries, we will redo this notebook in a more structured way. 
 
+The notebook is in the [repository](https://github.com/SergioPereiraLema/01_clusterAnalysis) of the project 
 

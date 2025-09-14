@@ -57,6 +57,8 @@ Nesta entrada empezarei configurando un entorno de desenvolvemento, creando a co
 
 Empezarei creando un caderno Jupyter para poder ir paso a paso vendo o detalle de cada funcionalidade, pero no futuro planteo crear unha app en Python con distintos módulos.
 
+O caderno Jupyter está no [repositorio](https://github.com/SergioPereiraLema/01_clusterAnalysis) do proxecto.
+
 ## Configuración do entorno
 
 Realizaremos o desenrolo usando Python nun portátil con Linux Mint, aínda que pode ser replicado e executado en calquera plataforma. Para empezar, usaréi Conda para crear un entorno de desenvolvemento coas librerías máis axeitadas para análise astronómico.

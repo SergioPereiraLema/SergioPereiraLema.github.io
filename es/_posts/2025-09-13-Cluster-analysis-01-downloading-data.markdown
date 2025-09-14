@@ -57,6 +57,8 @@ En esta primera entrada empezaré configurando un entorno de desarrollo, creando
 
 Empezaré creando un cuaderno Jupyter para poder ir paso a paso viendo el detalle de cada funcionalidad, pero en el futuro planteo crear una app en Python con distintos módulos.
 
+El cuaderno Jupyter está en el [repositorio](https://github.com/SergioPereiraLema/01_clusterAnalysis) del proyecto.
+
 ## Configuración del entorno
 
 Realizaremos el desarrollo usando Python en un portátil con Linux Mint, aunque es un desarrollo que puede ser replicado y ejecutado en cualquier plataforma. Para empezar, usaré Conda para crear un entorno de desarrollo con las librerías más adecuadas para análisis astronómico.
@@ -198,6 +200,7 @@ Podemos ejecutar el notebook para distintos objetos a partir de su nombre.
 Hasta aquí esta primera entrada, muy simple para iniciarnos en la recuperación de datos de objetos en la base de datos de Gaia DR3.
 
 En posteriores entradas reharemos este notebook más estructurado.
+
 
 
 

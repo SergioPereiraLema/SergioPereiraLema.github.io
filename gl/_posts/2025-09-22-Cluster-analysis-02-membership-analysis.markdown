@@ -1,0 +1,156 @@
+---
+# multilingual page pair id, this must pair with translations of this page. (This name must be unique)
+lng_pair: id_blog_1
+title: Análise de membresía do cúmulo M37
+
+# post specific
+# if not specified, .name will be used from _data/owner/[language].yml
+#author: ""
+# multiple category is not supported
+category: cluster
+# multiple tag entries are possible
+tags: [cluster, connection]
+# thumbnail image for post
+img: ":post_pic1.png"
+# disable comments on this page
+comments_disable: true
+
+# publish date
+date: 2025-09-22 22:00:00 +0900
+
+# seo
+# if not specified, date will be used.
+#meta_modify_date: 2021-08-11 12:35:04 +0900
+# check the meta_common_description in _data/owner/[language].yml
+#meta_description: ""
+
+# optional
+# please use the "image_viewer_on" below to enable image viewer for individual pages or posts (_posts/ or [language]/_posts folders).
+# image viewer can be enabled or disabled for all posts using the "image_viewer_posts: true" setting in _data/conf/main.yml.
+#image_viewer_on: true
+# please use the "image_lazy_loader_on" below to enable image lazy loader for individual pages or posts (_posts/ or [language]/_posts folders).
+# image lazy loader can be enabled or disabled for all posts using the "image_lazy_loader_posts: true" setting in _data/conf/main.yml.
+#image_lazy_loader_on: true
+# exclude from on site search
+#on_site_search_exclude: true
+# exclude from search engines
+#search_engine_exclude: true
+# to disable this page, simply set published: false or delete this file
+#published: false
+---
+
+<!-- outline-start -->
+
+Nesta segunda entrada vou facer un análise de membresía, é dicir, decidir qué estrelas dunha rexión pertencen a un cúmulo a partir de datos de Gaia.
+
+<!-- outline-end -->
+
+# Análise de pertenza
+
+## Introducción
+
+Nesta segunda entrada veremos cómo decidir qué estrelas descargadas dunha rexión pertencen realmente ao cúmulo e cáles son estrelas do campo.
+
+Esta fin de semana fun co meu telescopio Dobson de 254mm de abertura ao Centro Astronómico de Trevinca aproveitando a lúa nova. As terras de Trevinca teñen posiblemente os mellores ceos de Galicia e do noroeste de España, e sempre merece a pena acercarse para desfutar dun ceo estrelado. O ceo non era o mellor, o fume dos incendios cercanos e algunha nube molestaban, pero aínda así puiden desfrutar de bastantes obxectos. Un deses obxectos que sempre maravilla con prismáticos ou con telescopio é o cúmulo aberto M37 (NGC 2009), na constelación de Auriga. A vista é abraiante; un uaaaau é case inevitable. Desfrutei del durante bastantes minutos, recorrendo o campo pouco a pouco. Agora pretendo aprender algo máis do que vin no ocular. Usando os datos de Gaia vou descargar as estrelas nese campo e decidir cales son realmente do cúmulo e cales son estrelas de fondo nese mesmo campo.
+
+M37 é o cúmulo máis rico da constelación de Auriga, con outros dous membros moi interesantes, M36 e M38. Según a Wikipedia e algunhas outras fontes é coñecido como "Cúmulo da sal e pementa". Segundo algúns estudios está a aproximadamente 4.500 anos-luz de distancia. A luz que vin esta fin de semana saiu máis ou menos cando se estaba a levantar o Dolmen de Dombate, un dos templos do megalitismo no noroeste de España, e un dos meus lugares predilectos.
+
+### Orixe e formación dos cúmulos abertos
+
+De cara a análise, compre explicar brévemente a orixe dun cúmulo aberto. Un cúmulo aberto é un grupo de estrelas que se formaron xuntas a partir da mesma nube molecular de gas e polvo. Coñecense tamén como 'cúmulos galácticos' porque atópanse no plano das galaxias espiráis, como a nosa Vía Láctea, onde a formación estelar é máis activa. As estrelas dos cúmulos abertos soen ser xóvenes (< 1.000 millóns de anos de idade), soen estar compostos dende poucas decenas ata uns poucos miles de estrelas. A súa forma é irregular, e as súas estrelas están ligadas gravitatoriamente.
+
+O proceso de formación dun cúmulo aberto empeza cunha gran nube molecular de gas e pó. Dentro desta nebulosa, a gravidade provoca que algunhas zonas se contraigan e colapsen. A medida que estas rexións se comprimen, a presión e a temperatura aumentan, o que desencadena as reaccións de fusión nuclear e o nacemento de novas estrelas. As estrelas recén formadas emiten unha gran cantidade de radiación e ventos estelares que empuxan o gas e o pó restantes cara o exterior. Este proceso disipa a nebulosa de orixen, deixando atrás o grupo de estrelas xóvenes que resultan visibles como un cúmulo aberto.
+
+Debido a que as estrelas dun cúmulo abierto non están tan fortemente unidas pola gravidade como nos cúmulos globulares, a interacción gravitatoria con outras estrelas, nubes de gas ou o propio centro da galaxia fai que, co tempo, o cúmulo se disperse e as súas estrelas se separen.
+
+### Análise de pertenza
+
+A análise de pertenza busca separar qué estrelas que realmente pertencen ao cúmulo das estrelas de campo que só están na mesma liña de visión 
+por casualidade. As estrelas do cúmulo son estrelas que naceron xuntas, móvense xuntas e estan á mesma distancia. As estrelas de campo están a diferentes distancias e móvense aleatoriamente; non parecen estar relacionadas entre sí nin co resto das estrelas do cúmulo. Tendo isto en conta, usaremos 3 parámetros para facer a análise de pertenza:
+
+- pmRA e pmDEC (movementos propios): as estrelas do cúmulo teñen movementos propios moi similares porque naceron da mesma nube molecular e manteñen velocidades similares, o cúmulo móvese coma un todo pola Galaxia.
+- paralaxe: as estrelas do cúmulo están á mesma distancia polo que teñen paralaxes similares.
+
+Para facer a análise usando algoritmos de clustering, podemos escoller entre varios. Un que usei no pasado en entornos de datos empresariais é K-means. Outro que se usa en este tipo de análise é DBSCAN. Vou usar este último por varios motivos: o principal diría que é que DBSCAN non precisa saber a priori cántos grupos ten que facer, se non que o descubre automáticamente. Dado que o propósito desta entrada é amosar unha posible aplicación dos datos de Gaia para analizar cúmulos abertos, non profundizarei moito máis comparando con outros métodos, ou mellorando a implementación deste algoritmo (algo que espero ir facendo máis adiante). Fai uns anos nun proxecto para unha empresa probei PyCaret para validar o resultado con distintos algoritmos, facer o axuste fino dos parámetros e orquestrar todo o pipeline en só 14 liñas de código. Espero revisalo próximamente neste contexto.
+
+
+### Descripción do procesado
+
+O caderno Jupyter está no [repositorio](https://github.com/SergioPereiraLema/01_clusterAnalysis) do proxecto.
+
+## Configuración do entorno
+
+Realizarei o desenrolo usando Python no mesmo entorno virtual que creei na primeira entrada. Só hai que engadir a popular librería sklearn
+
+
+``` bash
+conda activate cluster_env
+
+pip install scikit-learn
+```
+
+## Obtención de datos
+
+### Datos básicos dende SIMBAD
+
+Vou reaproveitar parte do código que fixen no primeiro caderno Jupyter. Primeiro, recupero os datos básicos (coordenadas, tamaño...) en [SIMBAD](https://simbad.u-strasbg.fr/simbad/). Con este resultado xa temos os datos necesarios para consultar en Gaia (coordenadas e tamaño). Ao executar a consulta en SIMBAD obteño:
+
+- Name: M  37
+- Type: OpC
+- RA: 88.077300º
+- Dec: 32.543400º
+- PmRA: 1.924 (mas/yr)
+- PmDec: -5.648 (mas/yr)
+- galdim_majaxis: 19.299999237060547 (arcmin)
+- galdim_minaxis: 19.299999237060547 (arcmin)
+- Radius: 9.649999618530273 (arcmin)
+- Parallax: 0.666 (mas)
+
+Xa teño as coordenadas e o tamaño. Con iso imos lanzar a consulta a Gaia. Hai que ter en conta neste momento que o tamaño máximo que estou collendo é o que devolve SIMBAD. Quizáis debería ampliar un pouco máis o radio de búsqueda para non deixar fora da consulta estrelas do cúmulo.
+
+### Consulta á base de datos DR3 de Gaia
+
+Agora imos conectarnos á base de datos de Gaia e lanzar unha consulta a partir dos parámetros obtidos. Nesta ocasión aproveito para facer unha función que espero ir pulindo e reaproveitando máis adiante. 
+
+A consulta [ADQL](https://www.cosmos.esa.int/web/gaia-users/archive/writing-queries) xa inclúe varios filtros de calidade:
+
+- `paralallax IS NOT NULL`: con isto evito descargar datos de estrelas sen paralaxe, dato imprescindible para poder asignar a estrela a un cúmulo posteriormente.
+- `parallax > 0`: recupero só estrelas con paralaxe válida
+- `parallax_error/parallax < 0.2`: filtro só resultados con erro na paralaxe baixo
+- `pmra_error IS NOT NULL` e `pmdec_error IS NOT NULL` : estrelas con erro reportado nos movementos propios
+- `pmra_error < 20` e `pmdec_error < 20` : estrelas con baixo erro nos movementos propios 
+- `ruwe < 1.4`: estrellas con Renormalised Unit Weight Error <1.4 que garantiza eliminar estrelas binarias, astrometría aceptable...
+- `astrometric_excess_noise < 1`: garante que os datos teñan boa calidade adicional ao anterior
+- `phot_g_mean_mag IS NOT NULL`: estrelas con magnitude non nula
+- `phot_g_mean_mag < 20`: estrellas máis brilantes de magnitude 20
+- `phot_bp_mean_mag IS NOT NULL`: estrelas con magnitude BP non nula
+- `phot_rp_mean_mag IS NOT NULL`: estrelas con magnitude RP non nula
+
+
+E lanzo a consulta de forma sinxela, reaproveitando o código anterior. Esta consulta devolve un obxecto `astropy.table.Table`, que transformo nun Pandas Dataframe co método to_pandas().
+
+A consulta devolve ... estrelas.
+
+### Algunhas visualizacións básicas
+
+Agora fago algunha gráfica interesante que servirán en futuras análises dos cúmulos. Polo momento só de xeito ilustrativo:
+
+- **mapa celeste**
+- **diagrama de movementos propios**
+- **histograma de paralaxes**
+- **diagrama color-magnitude**
+
+Tamén estiven a probar a conversión dos parámetros BP e RP a cores RGB, de xeito que poderíamos pintar a cor real de cada estrela nestes gráficos, e ver o resultado. 
+
+En próximas entradas profundizarei na información que se pode extraer de cada un. 
+
+### Análise de membresía
+
+Aquí ven a parte importante do proxecto: usar algoritmos de clustering para determinar cales son as estrelas que pertencen ao cúmulo. Como comentaba na introducción, só probarei agora o algoritmo DBSCAN. Defino unha función e seguindo os pasos habituais, aplico StandardScaler para *escalar* os datos e logo aplico o algoritmo sobre os datos. Usei uns parámetros que atopei en algunha lectura, pero que requerirían un fine tunning para obter os mellores resultados.
+
+
+
+
+
+
+

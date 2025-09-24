@@ -114,22 +114,15 @@ Agora imos conectarnos á base de datos de Gaia e lanzar unha consulta a partir 
 
 A consulta [ADQL](https://www.cosmos.esa.int/web/gaia-users/archive/writing-queries) xa inclúe varios filtros de calidade:
 
-- `paralallax IS NOT NULL`: con isto evito descargar datos de estrelas sen paralaxe, dato imprescindible para poder asignar a estrela a un cúmulo posteriormente.
 - `parallax > 0`: recupero só estrelas con paralaxe válida
-- `parallax_error/parallax < 0.2`: filtro só resultados con erro na paralaxe baixo
+- `parallax/parallax_error > 5`: filtro só resultados con erro na paralaxe baixo
 - `pmra_error IS NOT NULL` e `pmdec_error IS NOT NULL` : estrelas con erro reportado nos movementos propios
-- `pmra_error < 20` e `pmdec_error < 20` : estrelas con baixo erro nos movementos propios 
-- `ruwe < 1.4`: estrellas con Renormalised Unit Weight Error <1.4 que garantiza eliminar estrelas binarias, astrometría aceptable...
-- `astrometric_excess_noise < 1`: garante que os datos teñan boa calidade adicional ao anterior
-- `phot_g_mean_mag IS NOT NULL`: estrelas con magnitude non nula
 - `phot_g_mean_mag < 20`: estrellas máis brilantes de magnitude 20
-- `phot_bp_mean_mag IS NOT NULL`: estrelas con magnitude BP non nula
-- `phot_rp_mean_mag IS NOT NULL`: estrelas con magnitude RP non nula
-
+- `ruwe < 1.4`: estrellas con Renormalised Unit Weight Error <1.4 que garantiza eliminar estrelas binarias, astrometría aceptable...
 
 E lanzo a consulta de forma sinxela, reaproveitando o código anterior. Esta consulta devolve un obxecto `astropy.table.Table`, que transformo nun Pandas Dataframe co método to_pandas().
 
-A consulta devolve ... estrelas.
+A consulta devolve 2.224 estrelas.
 
 ### Algunhas visualizacións básicas
 
@@ -140,7 +133,14 @@ Agora fago algunha gráfica interesante que servirán en futuras análises dos c
 - **histograma de paralaxes**
 - **diagrama color-magnitude**
 
+### Picture (centered)
+
+![diagramas básicos](:post_pic1.jpg)
+
 Tamén estiven a probar a conversión dos parámetros BP e RP a cores RGB, de xeito que poderíamos pintar a cor real de cada estrela nestes gráficos, e ver o resultado. 
+
+![diagramas básicos](:post_pic1.jpg)
+
 
 En próximas entradas profundizarei na información que se pode extraer de cada un. 
 

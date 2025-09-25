@@ -1,7 +1,7 @@
 ---
 # multilingual page pair id, this must pair with translations of this page. (This name must be unique)
 lng_pair: id_blog_1
-title: Análise de membresía do cúmulo M37
+title: Análise de pertenza do cúmulo M37 - I
 
 # post specific
 # if not specified, .name will be used from _data/owner/[language].yml
@@ -16,7 +16,7 @@ img: ":post_pic1.png"
 comments_disable: true
 
 # publish date
-date: 2025-09-22 22:00:00 +0900
+date: 2025-09-25 22:00:00 +0900
 
 # seo
 # if not specified, date will be used.
@@ -45,7 +45,7 @@ Nesta segunda entrada vou facer un análise de membresía, é dicir, decidir qu�
 
 <!-- outline-end -->
 
-# Análise de pertenza - I
+# Análise de pertenza
 
 ## Introducción
 
@@ -196,7 +196,16 @@ A saída final deste bloque de código é unha nova columna no DataFrame indican
 
 Na seguinte entrada buscarei literatura sobre análises deste cúmulo para comparar e ver se a miña aproximación parece correcta.
 
-### Visualización dos resultados
+### Resultados
+
+Agora temos un DataFrame con datos das estrelas pertencentes ao cúmulo con varios parámetros, dos que podemos sacar alguns resultados:
+
+- `RA do centro`: 88.074º
+- `DEC do centro`: 32.542º
+- `mean pmRA`: 1.49 ± 0.89 mas/ano
+- `mean pmDEC`: -4.63 ± 1.74 mas/ano
+- `mean Parallax`: 0.61 ± 0.016
+- `mean distance`:  ~ 1.639 pc
 
 E finalmente, engadimos as mesmas visualizacións anteriores, pero marcando cales son as estrelas membros do cúmulo.
 
@@ -204,13 +213,15 @@ E finalmente, engadimos as mesmas visualizacións anteriores, pero marcando cale
 
 ## Conclusións e seguintes pasos
 
-O presente exercición é só outra introducción para aprender a descargar e facer análise de datos dun cúmulo aberto cos datos dispoñibles en Gaia. Esto será a base para comenzar en próximas entregas a realizar interpretacións científicas destes análises. Quedan abertos aínda bastantes puntos nos que espero traballar próximamente:
+O presente exercició é só outra introducción para aprender a descargar e facer análise de datos dun cúmulo aberto cos datos dispoñibles en Gaia. Esto será a base para comenzar en próximas entregas a realizar interpretacións científicas destes análises. 
 
+Quedan abertos aínda bastantes puntos nos que espero traballar próximamente:
+
+- Atopar literatura científica coa que poder comparar os resultados.
 - Realizar fine tunning dos parámetros usados no algoritmo
 - Comparar os resultados con outros algoritmos para realizar a análise de pertenza
-- Atopar literatura científica coa que poder comparar os resultados.
 
-Na seguinte entrada tentarei facer esta investigación e comparar os resultados obtidos con outros estudios publicados, e avanzar na interpretación física dos gráficos e a información relevante que se pode obter.
+Na seguinte entrada tentarei facer esta investigación, comparar os resultados obtidos con outros estudios publicados, e avanzar na interpretación física dos gráficos e a información relevante que se pode obter.
 
 
 

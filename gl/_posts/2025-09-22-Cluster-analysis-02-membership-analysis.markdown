@@ -11,12 +11,12 @@ category: cluster
 # multiple tag entries are possible
 tags: [cluster, connection]
 # thumbnail image for post
-img: ":post_pic1.png"
+img: ":M37.png"
 # disable comments on this page
 comments_disable: true
 
 # publish date
-date: 2025-09-25 22:00:00 +0900
+date: 2025-09-27 13:00:00 +0200
 
 # seo
 # if not specified, date will be used.

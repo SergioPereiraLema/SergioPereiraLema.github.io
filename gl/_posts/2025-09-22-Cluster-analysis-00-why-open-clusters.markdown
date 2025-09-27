@@ -1,7 +1,7 @@
 ---
 # multilingual page pair id, this must pair with translations of this page. (This name must be unique)
 lng_pair: id_blog_1
-title: Análise de pertenza do cúmulo M37 - I
+title: Por qué o estudo de cúmulos abertos
 
 # post specific
 # if not specified, .name will be used from _data/owner/[language].yml
@@ -51,9 +51,9 @@ Nesta segunda entrada vou facer un análise básico de membresía, é dicir, dec
 
 Nesta entrada veremos cómo decidir qué estrelas descargadas dunha rexión pertencen realmente a un cúmulo e cáles son estrelas do campo.
 
-A pasada fin de semana fun co meu telescopio Dobson de 254mm de abertura ao [Centro Astronómico de Trevinca](https://astrotrevinca.com/) aproveitando a lúa nova. As terras de Trevinca teñen posiblemente os mellores ceos de Galicia e do noroeste de España, e sempre merece a pena acercarse para desfutar dun ceo estrelado. O ceo non era o mellor: o fume dos incendios cercanos e algunha nube molestaron, pero aínda así puiden desfrutar de bastantes obxectos. Un deses obxectos que sempre maravilla con prismáticos ou con telescopio é o cúmulo aberto M37 (NGC 2009), na constelación de Auriga. A vista ao telescopio é abraiante; un uaaaau é case inevitable. Desfrutei del durante bastantes minutos, recorrendo o campo pouco a pouco, con distintos aumentos e pódense identificar máis dun cento de estrelas no campo. Agora pretendo aprender algo máis do que vin no ocular. Usando os datos de Gaia vou descargar as estrelas nese campo e decidir cales son realmente do cúmulo e cales son estrelas de fondo nese mesmo campo. Na segunda entrega espero poder facer algunha análise máis e aprender a facer a interpretación astrofísica dos resultados.
+Esta fin de semana fun co meu telescopio Dobson de 254mm de abertura ao [Centro Astronómico de Trevinca](https://astrotrevinca.com/) aproveitando a lúa nova. As terras de Trevinca teñen posiblemente os mellores ceos de Galicia e do noroeste de España, e sempre merece a pena acercarse para desfutar dun ceo estrelado. O ceo non era o mellor, o fume dos incendios cercanos e algunha nube molestaban, pero aínda así puiden desfrutar de bastantes obxectos. Un deses obxectos que sempre maravilla con prismáticos ou con telescopio é o cúmulo aberto M37 (NGC 2009), na constelación de Auriga. A vista ao telescopio é abraiante; un uaaaau é case inevitable. Desfrutei del durante bastantes minutos, recorrendo o campo pouco a pouco, con distintos aumentos e pódense identificar máis dun cento de estrelas no campo. Agora pretendo aprender algo máis do que vin no ocular. Usando os datos de Gaia vou descargar as estrelas nese campo e decidir cales son realmente do cúmulo e cales son estrelas de fondo nese mesmo campo. Na segunda entrega espero poder facer algunha análise máis e aprender a facer a interpretación astrofísica dos resultados.
 
-![O meu Dobson de 10 pulgadas](:dobson.png)
+![O meu Dobson de 10 pulgadas](:dobson.jpg)
 
 M37 é o cúmulo máis rico da constelación de Auriga, con outros dous membros moi interesantes, M36 e M38. Según algunhas fontes é coñecido como "Cúmulo da sal e pementa". Segundo algúns estudios está a aproximadamente 4.500 anos-luz de distancia. A luz que vin esta fin de semana saiu máis ou menos cando se estaba a levantar o [Dolmen de Dombate](https://concello-cabana.es/es/elementor-2454/), a catedral do megalitismo no noroeste de España, e un dos meus lugares predilectos.
 
@@ -78,11 +78,11 @@ Para facer a análise usando algoritmos de clustering, podemos escoller entre va
 
 ### Descripción do procesado
 
-O caderno Jupyter está no [repositorio](https://github.com/SergioPereiraLema/Cluster-Analytics-Using-Data-from-Gaia/) do proxecto.
+O caderno Jupyter está no [repositorio](https://github.com/SergioPereiraLema/01_clusterAnalysis) do proxecto.
 
 ## Configuración do entorno
 
-Realizarei o desenrolo usando Python no mesmo entorno virtual que creei na primeira entrada. Só hai que engadir a popular librería [scikit-learn](https://scikit-learn.org/).
+Realizarei o desenrolo usando Python no mesmo entorno virtual que creei na primeira entrada. Só hai que engadir a popular librería sklearn
 
 
 ``` bash
@@ -107,7 +107,7 @@ Vou reaproveitar parte do código que fixen no primeiro caderno Jupyter. Primeir
 - `Radius`: 9.649999618530273 (arcmin)
 - `Parallax`: 0.666 (mas)
 
-Xa teño as coordenadas e o tamaño. Con iso imos lanzar a consulta á base de datos DR3 de Gaia. Hai que ter en conta neste momento que o tamaño máximo que estou collendo é o que devolve SIMBAD. Quizáis debería ampliar un pouco máis o radio de búsqueda para non deixar fora da consulta estrelas do cúmulo. O campo aparente que vin no ocular do telescopio sí me pareceu superior a 20 minutos de arco.
+Xa teño as coordenadas e o tamaño. Con iso imos lanzar a consulta a Gaia. Hai que ter en conta neste momento que o tamaño máximo que estou collendo é o que devolve SIMBAD. Quizáis debería ampliar un pouco máis o radio de búsqueda para non deixar fora da consulta estrelas do cúmulo.
 
 ### Consulta á base de datos DR3 de Gaia
 
@@ -152,7 +152,7 @@ Seguindo os pasos habituais na aplicacións de algoritmos de clasificación, apl
 
 A saída final deste bloque de código é unha nova columna no DataFrame indicando se cada unha das estrelas descargadas é ou non é membro do cúmulo principal. E con isto obteño 1.465 estrelas pertencentes ao cúmulo e 318 identificadas como ruido. 
 
-Na seguinte entrada buscarei literatura sobre outras análises deste cúmulo para comparar e ver se a miña aproximación semella correcta.
+Na seguinte entrada buscarei literatura sobre análises deste cúmulo para comparar e ver se a miña aproximación parece correcta.
 
 ### Resultados
 
@@ -171,18 +171,15 @@ E finalmente, engadimos as mesmas visualizacións anteriores, pero marcando cale
 
 ## Conclusións e seguintes pasos
 
-O presente exercició é só outra introducción para aprender a descargar e facer análise de datos dun cúmulo aberto cos datos dispoñibles en Gaia DR3. Este tipo de exercicios axudanme no proceso de descubrir todos os datos dispoñibles na base de datos de Gaia, qué atributos son os máis relevantes no estudo dos cúmulos abertos e cómo procesalos. Tamén, aínda que será descrito na parte II deste artigo, descubrir a literatura científica sobre este e outros cúmulos, aprender sobre os parámetros físicos que se teñen estudiado, e cales son as liñas de investigación abertas neste campo. 
+O presente exercició é só outra introducción para aprender a descargar e facer análise de datos dun cúmulo aberto cos datos dispoñibles en Gaia. Esto será a base para comenzar en próximas entregas a realizar interpretacións científicas destes análises. 
 
-Con todo isto agardo ir avanzando en adquirir unha base sólida para profundizar nestes eido e desenrolar análises máis complexas. 
-
-Sobre a análise de M37, quedan abertos aínda bastantes puntos nos que espero traballar próximamente:
+Quedan abertos aínda bastantes puntos nos que espero traballar próximamente:
 
 - Atopar literatura científica coa que poder comparar os resultados.
-- Realizar fine tunning dos parámetros usados no algoritmo.
-- Comparar os resultados con outros algoritmos para realizar a análise de pertenza.
+- Realizar fine tunning dos parámetros usados no algoritmo
+- Comparar os resultados con outros algoritmos para realizar a análise de pertenza
 
-Na seguinte entrada tentarei facer esta investigación, comparar os resultados obtidos con outros estudios publicados, e avanzar na interpretación física dos gráficos e da información relevante que se pode obter.
-
+Na seguinte entrada tentarei facer esta investigación, comparar os resultados obtidos con outros estudios publicados, e avanzar na interpretación física dos gráficos e a información relevante que se pode obter.
 
 
 

@@ -57,7 +57,7 @@ En esta primera entrada empezaré configurando un entorno de desarrollo, creando
 
 Empezaré creando un cuaderno Jupyter para poder ir paso a paso viendo el detalle de cada funcionalidad, pero en el futuro planteo crear una app en Python con distintos módulos.
 
-El cuaderno Jupyter está en el [repositorio](https://github.com/SergioPereiraLema/01_clusterAnalysis) del proyecto.
+El cuaderno Jupyter está en el [repositorio](https://github.com/SergioPereiraLema/Open-Clusters-Analytics) del proyecto.
 
 ## Configuración del entorno
 

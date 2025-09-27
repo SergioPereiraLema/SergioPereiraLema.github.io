@@ -78,7 +78,7 @@ To perform the analysis using clustering algorithms, we can choose from several 
 
 ### Description of the process
 
-Jupyter notebook is uploaded to the [repository](https://github.com/SergioPereiraLema/Cluster-Analytics-Using-Data-from-Gaia/) of the project.
+Jupyter notebook is uploaded to the [repository](https://github.com/SergioPereiraLema/Open-Clusters-Analytics/) of the project.
 
 ## Environment configuration
 

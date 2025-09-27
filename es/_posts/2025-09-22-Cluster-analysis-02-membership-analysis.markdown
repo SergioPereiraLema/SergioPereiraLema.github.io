@@ -77,7 +77,7 @@ Para hacer el análisis usando algoritmos de clustering, podemos escoger entre v
 
 ### Descripción del procesado
 
-El cuaderno Jupyter está en el [repositorio](https://github.com/SergioPereiraLema/Cluster-Analytics-Using-Data-from-Gaia/) del proyecto.
+El cuaderno Jupyter está en el [repositorio](https://github.com/SergioPereiraLema/Open-Clusters-Analytics/) del proyecto.
 
 ## Configuración del entorno
 

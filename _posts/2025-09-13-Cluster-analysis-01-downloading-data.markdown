@@ -199,5 +199,5 @@ That concludes this first entry, which is very simple and serves as an introduct
 
 In future entries, we will redo this notebook in a more structured way. 
 
-The notebook is in the [repository](https://github.com/SergioPereiraLema/01_clusterAnalysis) of the project 
+The notebook is in the [repository](https://github.com/SergioPereiraLema/Open-Clusters-Analytics) of the project 
 

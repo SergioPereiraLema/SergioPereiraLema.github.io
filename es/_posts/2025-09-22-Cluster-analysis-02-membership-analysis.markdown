@@ -1,6 +1,6 @@
 ---
 # multilingual page pair id, this must pair with translations of this page. (This name must be unique)
-lng_pair: id_blog_1
+lng_pair: id_blog_2
 title: Análisis de membresía del cúmulo M37
 
 # post specific

@@ -1,7 +1,7 @@
 ---
 # multilingual page pair id, this must pair with translations of this page. (This name must be unique)
 lng_pair: id_blog_3
-title: Análise de pertenza do cúmulo M37 - II
+title: Análise de pertenza do cúmulo M37 II - DBSCAN
 
 # post specific
 # if not specified, .name will be used from _data/owner/[language].yml
@@ -41,11 +41,11 @@ date: 2025-10-12 22:00:00 +0200
 
 <!-- outline-start -->
 
-Continuamos coa análise de pertenza para as estrelas do cúmulo M37, probando varios algoritmos, axustando parámetros e comparando os resultados coa literatura dispoñible.
+Continuamos coa análise de pertenza para as estrelas do cúmulo M37, probando varios algoritmos, axustando parámetros e comparando os resultados coa literatura dispoñible. Nesta entrada centrarémonos en perfeccionar a análise con DBSCAN e analizar os seus resultados
 
 <!-- outline-end -->
 
-# Análise de pertenza
+# Análise de pertenza con DBSCAN
 
 ## Introducción
 

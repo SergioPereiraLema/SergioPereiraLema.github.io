@@ -51,7 +51,7 @@ Continuamos coa análise de pertenza para as estrelas do cúmulo M37, probando v
 
 Na primeira parte vimos cómo facer unha análise básica de pertenza a un cúmulo aberto a partir dos datos descargados de Gaia para unha rexión dada. Nesta ocasión, imos facer esa análise moito máis rigurosa, usando varios algoritmos (DBSCAN, HDBSCAN e GMM), comparando os resultados entre eles e coa literatura dispoñible.
 
-Buscando literatura atopo que M37 é un cúmulo bastante estudiado e que me permite comparar os resultados obtidos e validar o meu proxecto. Na 
+Buscando literatura atopo que M37 é un cúmulo bastante estudiado e que me permite comparar os resultados obtidos e validar o meu proxecto. 
 
 Coma nos artigos previos, os datos que usarei son descargados de [Gaia DR3](https://www.cosmos.esa.int/web/gaia/dr3) (Gaia Collaboration, Vallenari, A., et al. [(arXiv)](https://arxiv.org/abs/2208.00211) [(ADS)](https://ui.adsabs.harvard.edu/abs/2023A%26A...674A...1G/abstract)). A base de datos Gaia DR3 é a terceira release de datos e proporciona uns 1.81 mil millóns de obxectos, dos cales 1.47 mil millóns teñen os datos completos de astrometría e fotometría. En particular, os datos de paralaxe e movementos propios con altísima precisión serán usados aquí para a análise de pertenza.
 
@@ -108,7 +108,9 @@ Con estes datos a consulta a Gaia devolve 53.109 estrelas, con esta estadística
 - `μ_α medio`: 1.19 ± 5.32 mas/yr
 - `μ_δ medio`: -4.55 ± 7.60 mas/yr
 
-Aquí decido aplicar un filtro antes de aplicar os algoritmos de clasificación. Está bastante claro que nesta consulta hai moitas estrelas no mesmo campo de visión que non pertencen ao cúmulo. Pensemos agora que o cúmulo son precisamente estrelas que naceron na mesma zona e que se moven máis ou menos do mesmo xeito (con certa dispersión, por suposto). Para reducir o procesamento posterior e ir eliminando erros, vou filtrar os datos a partir do coñecemento que xa existe sobre o cúmulo M37. A valores de paralaxe e dos movementos propios dos membros do cúmulo teñen que estar nun valor cercano ao xa coñecido. Se filtramos os datos preto deses valores coñecidos e eliminamos os restantes, iremos afinando. ¿Cómo decidir os valores para filtrar? Considero o seguinte: cando decido un rango para o filtrado debo ter en conta que a Dispersión Total nos valores dos membros estará composta por:
+## Filtrado dos datos descargados
+
+Aquí decidín aplicar un filtro antes de aplicar os algoritmos de clasificación. Está bastante claro que nesta consulta hai moitas estrelas no mesmo campo de visión que non pertencen ao cúmulo. Pensemos agora que o cúmulo son precisamente estrelas que naceron na mesma zona e que se moven máis ou menos do mesmo xeito (con certa dispersión, por suposto). Para reducir o procesamento posterior e ir eliminando erros, vou filtrar os datos a partir do coñecemento que xa existe sobre o cúmulo M37. A valores de paralaxe e dos movementos propios dos membros do cúmulo teñen que estar nun valor cercano ao xa coñecido. Se filtramos os datos preto deses valores coñecidos e eliminamos os restantes, iremos afinando. ¿Cómo decidir os valores para filtrar? Considero o seguinte: cando decido un rango para o filtrado debo ter en conta que a Dispersión Total nos valores dos membros estará composta por:
 
 <p style="text-align:center;">Dispersión total = dispersión intrínseca + erros de medida</p>
 
@@ -180,9 +182,6 @@ A partir de ahí fago unha normalización dos datos, para levalos todos a unha e
 DBSCAN (Density-Based Spatial Clustering of Applications with Noise) é un algoritmo que agrupa puntos baseándose na súa densidade local. O algoritmo ten dous parámetros principais:
 - `eps`: a distancia máxima entre dous puntos para consideralos veciños.
 - `min_samples`: o número mínimo de puntos necesarios para formar un grupo denso.
-
-DBSCAN funciona como si esparcieras semillas en un campo y solo consideraras "grupos" aquellas zonas donde caen muchas semillas juntas. El parámetro eps define qué tan juntas deben estar las semillas para considerarlas vecinas, mientras que min_samples determina cuántas semillas necesitas en un área para considerar que hay un "grupo real" y no solo casualidad. La gran ventaja es que las estrellas aisladas (del campo) se marcan explícitamente como ruido (etiqueta -1), lo cual tiene mucho sentido astrofísico.
-
 
 DBSCAN é especialmente bo para cúmulos porque:
 1. Non asume que os grupos teñen forma esférica

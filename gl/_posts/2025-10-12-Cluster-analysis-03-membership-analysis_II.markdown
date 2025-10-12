@@ -55,15 +55,7 @@ Buscando literatura atopo que M37 é un cúmulo bastante estudiado e que me perm
 
 Coma nos artigos previos, os datos que usarei son descargados de [Gaia DR3](https://www.cosmos.esa.int/web/gaia/dr3) (Gaia Collaboration, Vallenari, A., et al. [(arXiv)](https://arxiv.org/abs/2208.00211) [(ADS)](https://ui.adsabs.harvard.edu/abs/2023A%26A...674A...1G/abstract)). A base de datos Gaia DR3 é a terceira release de datos e proporciona uns 1.81 mil millóns de obxectos, dos cales 1.47 mil millóns teñen os datos completos de astrometría e fotometría. En particular, os datos de paralaxe e movementos propios con altísima precisión serán usados aquí para a análise de pertenza.
 
-Segundo a propia ESA os datos liberados como Gaia Early Data Release 3 (Gaia EDR3) comprenden:
-
-- A solución astrométrica completa —posicións no ceo (α, δ), paralaxe e movemento propio— para ao redor de 1460 millóns (1,46 × 109) de fontes, cunha magnitude límite de aproximadamente G ≈ 21 e un límite de brillo de aproximadamente G ≈ 3. A solución astrométrica vai acompañada dalgúns novos indicadores de calidade, como RUWE, e descritores de imaxes de fontes.
-- A solución astrométrica completa realizouse como solución de 5 parámetros para 585 millóns de fontes e como solución de 6 parámetros para 882 millóns de fontes. Na solución de 6 parámetros, a cantidade axustada adicional é o denominado pseudocolor, que tivo que incluírse para as fontes sen información de cor de alta calidade. 
-- Ademais, solucións de dous parámetros (posicións no ceo (α, δ)) para ao redor de 344 millóns de fontes adicionais.
-- Magnitudes G para ao redor de 1806 millóns de fontes (co problema coñecido presente en EDR3 corrixido en Gaia DR3).
-- Magnitudes GBP e GRP para ao redor de 1540 millóns e 1550 millóns de fontes, respectivamente.
-
-Esta descripción dalgúns dos datos de Gaia era importante resaltala nalgún momento desta serie de artigos, e probablemente sexa merecedor dun artigo exclusivo.
+A descripción dalgúns dos datos de Gaia é importante resaltala nalgún momento desta serie de artigos, e probablemente sexa merecedor dun artigo exclusivo.
 
 Segundo a literatura atopada ou a propia [páxina de SIMBAD para M37](https://simbad.cds.unistra.fr/simbad/sim-basic?Ident=ngc2099&submit=SIMBAD+search) os datos principáis do cúmulo son:
 
@@ -119,33 +111,32 @@ Aquí decidín aplicar un filtro antes de aplicar os algoritmos de clasificació
     - Cúmulos xoves (<100 Myr):  σ_v ~ 0.5-1.5 km/s
     - Cúmulos intermedios (100-500 Myr): σ_v ~ 0.3-1.0 km/s
     - Cúmulos vellos (>500 Myr): σ_v ~ 0.2-0.8 km/s
+    
+    A idade estimada de M37 é de 500Myr, e escollerei un rango algo amplio. Se inclúo estrelas de máis, agardo que os algoritmos de clustering filtren as estrelas que non pertenzan. O rango fixado no filtro é de σ_v ~ 0.5-1.0 km/s, que se pode traducir a mas/yr coa fórmula:
 
-A idade estimada de M37 é de 500Myr, e escollerei un rango algo amplio. Se inclúo estrelas de máis, agardo que os algoritmos de clustering filtren as estrelas que non pertenzan. O rango fixado no filtro é de σ_v ~ 0.5-1.0 km/s, que se pode traducir a mas/yr coa fórmula:
+    ``` 
+    μ [mas/yr] = (v_transversal [km/s] / d [pc]) × 211.09
+    ``` 
 
-``` 
-μ [mas/yr] = (v_transversal [km/s] / d [pc]) × 211.09
-``` 
+    A distancia estimada de M37 é de 1500pc, có que os valores do rango serían:
 
-A distancia estimada de M37 é de 1500pc, có que os valores do rango serían:
+    ``` 
+    σ_μ = (0.5 km/s / 1500 pc) × 211.09 = 0.070 mas/yr (mínimo)
+    σ_μ = (1.0 km/s / 1500 pc) × 211.09 = 0.141 mas/yr (máximo)
+    ``` 
 
-``` 
-σ_μ = (0.5 km/s / 1500 pc) × 211.09 = 0.070 mas/yr (mínimo)
-σ_μ = (1.0 km/s / 1500 pc) × 211.09 = 0.141 mas/yr (máximo)
-``` 
-
-É dicir, engadiría unha **dispersión intrínseca σ_μ ~0.07 - 0.14 mas/yr**.
+    É dicir, engadiría unha **dispersión intrínseca σ_μ ~0.07 - 0.14 mas/yr**.
 
 - **Erro de medida de Gaia**
 Os erros de medida de Gaia teñen que ver con varios factores: magnitude (estrelas máis débiles teñen maior erro), rexións do ceo con maior ou menor densidade de estrelas, número de observacións... Os erros típicos por magnitude son:
 
+    |Magnitude G | Erro | Descripción|
+    |:----------:|:--------------:|:--------------:|
+    |G < 14| error_μ ~ 0.02-0.05 mas/yr | estrelas brilantes|
+    |14 < G < 16| error_μ ~ 0.05-0.15 mas/yr | estrelas intermedias|
+    |16 < G < 18| error_μ ~ 0.15-0.50 mas/yr | estrelas débiles|
 
-|Magnitude G | Erro | Descripción|
-|:----------:|:--------------:|:--------------:|
-|G < 14| error_μ ~ 0.02-0.05 mas/yr | estrelas brilantes|
-|14 < G < 16| error_μ ~ 0.05-0.15 mas/yr | estrelas intermedias|
-|16 < G < 18| error_μ ~ 0.15-0.50 mas/yr | estrelas débiles|
-
-De novo, vou escoller un rango amplio: **σ_error ~ 0.10-0.25 mas/yr** tendo en conta que as estrelas que máis contribúen ao cúmulo están no rango G=12-17. 
+    De novo, vou escoller un rango amplio: **σ_error ~ 0.10-0.25 mas/yr** tendo en conta que as estrelas que máis contribúen ao cúmulo están no rango G=12-17. 
 
 Á hora de combinar erros:
 
@@ -156,26 +147,27 @@ así que a **dispersión total esperada é de ~0.2 - 0.3 mas/yr**
 
 - **Marxe de seguridade**
 Na práctica hai outras causas que poden afectar á dispersión do cúmulo. Unha regla empírica robusta é usar ±3σ a ±5σ alrededor do valor esperado:
-```
-±3σ → captura 99.7% dunha distribución normal
-±4σ → captura 99.99% 
-±5σ → moi conservador
-```
-Prefiro ser conservador, e usar 5σ, o que nos daría para μ_α e para μ_δ unha marxe de σ_seguridade 1.25mas/yr.
+    ```
+    ±3σ → captura 99.7% dunha distribución normal
+    ±4σ → captura 99.99% 
+    ±5σ → moi conservador
+    ```
+    Prefiro ser conservador, e usar 5σ, o que nos daría para μ_α e para μ_δ unha marxe de σ_seguridade 1.25mas/yr.
 
 En global, quédome cun rango nos movementos propios de **rango μ_α de 0.7 a 3.0mas/yr e rango μ_δ de -7.0 a -4.0**
 
 - **Límites na paralaxe**
 Para filtrar a paralaxe e quedarnos dentro duns límites razonables que inclúan as estrelas do cúmulo e minimicen as estrelas de campo, teño en conta os valores estimados na literatura. A paralaxe estimada de M37 é de 0.666mas (distancia ~1500pc). A dispersión típica dun cúmulo aberto está entre os 10-50pc, que a unha distancia aproximada de 1500pc correspondería a unha marxe de paralaxe de ±0.01-0.05 mas. Engadimos unha marxe de erro na medida de Gaia (~0.05-0.10mas). Así que sendo conservadores, para non excluir estrelas do cúmulo no filtro, establezo un **rango na paralaxe de 0.50-0.85mas**. 
 
-Ao aplicar este límite sobre os datos descargados de Gaia, obteño:
 
-- `Número de estrelas`: **3377**
-- `Paralaxe medio`: **0.67 ± 0.08 mas**
-- `μ_α medio`: **1.86 ± 0.45 mas/yr**
-- `μ_δ medio`: **-5.50 ± 0.62 mas/yr**
+Ao aplicar estes límites sobre os datos descargados de Gaia, obteño:
 
-A partir de ahí fago unha normalización dos datos, para levalos todos a unha escala similar e que uns valores máis altos nun dos parámetros non dominen a análise.
+    - `Número de estrelas`: **3377**
+    - `Paralaxe medio`: **0.67 ± 0.08 mas**
+    - `μ_α medio`: **1.86 ± 0.45 mas/yr**
+    - `μ_δ medio`: **-5.50 ± 0.62 mas/yr**
+
+E como último paso fago unha normalización dos datos, para levalos todos a unha escala similar e que uns valores máis altos nun dos parámetros non dominen a análise.
 
 ## Análise de pertenencia con DBSCAN
 

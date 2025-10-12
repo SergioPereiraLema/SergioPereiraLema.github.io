@@ -79,9 +79,9 @@ Neste artigo compararemos 3 algoritmos de clasificación non supervisada (DBSCAN
 
 Para a descarga de datos de Gaia DR3 sigo o mesmo método que xa usei anteriormente cos seguintes parámetros:
 
-- `RA (α)`: 88.074
-- `Dec (δ)`: 32.545
-- `search_radius`:1.5º
+- `RA (α)`: **88.074**
+- `Dec (δ)`: **32.545**
+- `search_radius`: **1.5º**
 
 A elección de 1.5º pretende recuperar os datos non só de estrelas do centro do cúmulo, senon tamén as estrelas da coroa cercana e incluso algunha das estrelas evaporándose. Un radio máis grande podería ser adecuado para un estudo máis completo que inclúa as estructuras de marea do cúmulo. Non o farei neste momento, pero sí queda anotado como unha funcionalidad a selección do radio de búsqueda para incorporar en versións posteriores do código.
 
@@ -103,16 +103,16 @@ AND phot_g_mean_mag < 20
 
 Con estes datos a consulta a Gaia devolve 53.109 estrelas, con esta estadística básica:
 
-- `Número de estrelas`: 53109
-- `Paralaxe medio`: 0.84 ± 0.88 mas
-- `μ_α medio`: 1.19 ± 5.32 mas/yr
-- `μ_δ medio`: -4.55 ± 7.60 mas/yr
+- `Número de estrelas`: **53109**
+- `Paralaxe medio`: **0.84 ± 0.88 mas**
+- `μ_α medio`: **1.19 ± 5.32 mas/yr**
+- `μ_δ medio`: **-4.55 ± 7.60 mas/yr**
 
 ## Filtrado dos datos descargados
 
 Aquí decidín aplicar un filtro antes de aplicar os algoritmos de clasificación. Está bastante claro que nesta consulta hai moitas estrelas no mesmo campo de visión que non pertencen ao cúmulo. Pensemos agora que o cúmulo son precisamente estrelas que naceron na mesma zona e que se moven máis ou menos do mesmo xeito (con certa dispersión, por suposto). Para reducir o procesamento posterior e ir eliminando erros, vou filtrar os datos a partir do coñecemento que xa existe sobre o cúmulo M37. A valores de paralaxe e dos movementos propios dos membros do cúmulo teñen que estar nun valor cercano ao xa coñecido. Se filtramos os datos preto deses valores coñecidos e eliminamos os restantes, iremos afinando. ¿Cómo decidir os valores para filtrar? Considero o seguinte: cando decido un rango para o filtrado debo ter en conta que a Dispersión Total nos valores dos membros estará composta por:
 
-<p style="text-align:center;">Dispersión total = dispersión intrínseca + erros de medida</p>
+<p style="text-align:center;">**Dispersión total** = **dispersión intrínseca** + **erros de medida**</p>
 
 - **Dispersión instrínseca**: non todas as estrelas do cúmulo se moven igual. Hai unha dispersión de velocidades que se poden deber principalmente a interaccións gravitatorias internas entre sí, encontros cercanos entre dúas estrelas, estrelas binarias que crean movementos ao orbitar entre elas ou estrelas que *escapan* do cúmulo con velocidades anómalas. Estas dispersións nas velocidades pódese estimar aproximadamente en:
 
@@ -133,7 +133,7 @@ A distancia estimada de M37 é de 1500pc, có que os valores do rango serían:
 σ_μ = (1.0 km/s / 1500 pc) × 211.09 = 0.141 mas/yr (máximo)
 ``` 
 
-É dicir, engadiría unha dispersión intrínseca σ_μ ~0.07 - 0.14 mas/yr.
+É dicir, engadiría unha **dispersión intrínseca σ_μ ~0.07 - 0.14 mas/yr**.
 
 - **Erro de medida de Gaia**
 Os erros de medida de Gaia teñen que ver con varios factores: magnitude (estrelas máis débiles teñen maior erro), rexións do ceo con maior ou menor densidade de estrelas, número de observacións... Os erros típicos por magnitude son:
@@ -145,14 +145,14 @@ Os erros de medida de Gaia teñen que ver con varios factores: magnitude (estrel
 |14 < G < 16| error_μ ~ 0.05-0.15 mas/yr | estrelas intermedias|
 |16 < G < 18| error_μ ~ 0.15-0.50 mas/yr | estrelas débiles|
 
-De novo, vou escoller un rango amplio: σ_error ~ 0.10-0.25 mas/yr tendo en conta que as estrelas que máis contribúen ao cúmulo están no rango G=12-17. 
+De novo, vou escoller un rango amplio: **σ_error ~ 0.10-0.25 mas/yr** tendo en conta que as estrelas que máis contribúen ao cúmulo están no rango G=12-17. 
 
 Á hora de combinar erros:
 
 ```
 σ_total = √(σ_intrínseca² + σ_error²)
 ```
-así que a dispersión total esperada é de ~0.2 - 0.3 mas/yr
+así que a **dispersión total esperada é de ~0.2 - 0.3 mas/yr**
 
 - **Marxe de seguridade**
 Na práctica hai outras causas que poden afectar á dispersión do cúmulo. Unha regla empírica robusta é usar ±3σ a ±5σ alrededor do valor esperado:
@@ -170,10 +170,10 @@ Para filtrar a paralaxe e quedarnos dentro duns límites razonables que inclúan
 
 Ao aplicar este límite sobre os datos descargados de Gaia, obteño:
 
-- `Número de estrelas`: 3377
-- `Paralaxe medio`: 0.67 ± 0.08 mas
-- `μ_α medio`: 1.86 ± 0.45 mas/yr
-- `μ_δ medio`: -5.50 ± 0.62 mas/yr
+- `Número de estrelas`: **3377**
+- `Paralaxe medio`: **0.67 ± 0.08 mas**
+- `μ_α medio`: **1.86 ± 0.45 mas/yr**
+- `μ_δ medio`: **-5.50 ± 0.62 mas/yr**
 
 A partir de ahí fago unha normalización dos datos, para levalos todos a unha escala similar e que uns valores máis altos nun dos parámetros non dominen a análise.
 
@@ -190,18 +190,17 @@ DBSCAN é especialmente bo para cúmulos porque:
 
 O certo é que non atopei polo momento un método para decidir cales son os valores óptimos para cada cúmulo, porque sí afectan ao resultado do algoritmo, e non parecen comportarse igual en cada cúmulo. Para o meu caso, despois de varias probas quedo con estes valores:
 
-- `eps`: 0.3
-- `min_samples`: 20
+- `eps`: **0.3**
+- `min_samples`: **20**
 
 Con estes valores obteño os seguintes resultados:
 
-- Número de cúmulos identificados: 1
-- Estrelas clasificadas como ruido (campo): 1773
-- Estrelas en cúmulos: 1689
-- O cúmulo principal ten 1689 estrelas
-- Paralaxe: 0.67±0.05mas
-- μ_α*: 1.88±0.15mas/yr
-- μ_δ: -5.62±0.15mas/yr
+- `Número de cúmulos identificados`: **1**
+- `Estrelas clasificadas como ruido (campo)`: **1773**
+- `Estrelas clasificadas no cúmulo principal` **1689** 
+- `Paralaxe`: **0.67±0.05mas**
+- `μ_α`: **1.88±0.15mas/yr**
+- `μ_δ`: **-5.62±0.15mas/yr**
 
 Eses valores son extraordinariamente coincidentes con outros estudios (XXXXXXXXXXX) e cos propios datos de SIMBAD. Algunhas gráficas para ver o resultado:
 

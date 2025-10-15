@@ -289,6 +289,8 @@ No diagrama CMD vemos tamén a rama de xigantes vermellas en BP-RP entre 1.5 e 1
 
 Ao comparar as estrelas do cúmulo coas estrelas de campo no diagrama tamén hai diferenzas. As estrelas do campo están máis dispersas, e vemos como hai estrelas menos masivas na rama cara as xigantes, como a dispersión na secuencia principal é máis elevada, o que suxire múltiples idades, metalicidades e distancias.
 
+![CMD anotado](:cmd_dbscan_M37_annotated.png)
+
 
 ### Conclusión
 

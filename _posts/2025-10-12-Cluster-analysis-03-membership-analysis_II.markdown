@@ -16,7 +16,7 @@ img: ":M37.png"
 comments_disable: true
 
 # publish date
-date: 2025-10-12 22:00:00 +0200
+date: 2025-10-16 23:00:00 +0200
 
 # seo
 # if not specified, date will be used.
@@ -41,51 +41,43 @@ date: 2025-10-12 22:00:00 +0200
 
 <!-- outline-start -->
 
-Continuamos coa análise de pertenza para as estrelas do cúmulo M37, probando varios algoritmos, axustando parámetros e comparando os resultados coa literatura dispoñible.
+I continue with the membership analysis for the stars in the M37 cluster, testing various algorithms, adjusting parameters, and comparing the results with the available literature. In this post, I will focus on refining the analysis with DBSCAN and analysing its results.
+
+This is a long post, which includes concepts about stellar evolution and the clusters themselves. 
 
 <!-- outline-end -->
 
-# Análise de pertenza
+# Membership analysis
 
-## Introducción
+## Introduction
 
-Na primeira parte vimos cómo facer unha análise básica de pertenza a un cúmulo aberto a partir dos datos descargados de Gaia para unha rexión dada. Nesta ocasión, imos facer esa análise moito máis rigurosa, usando varios algoritmos (DBSCAN, HDBSCAN e GMM), comparando os resultados entre eles e coa literatura dispoñible.
+In the [first part](https://exploregaiadata.com/gl/2025-09-22-Cluster-analysis-02-membership-analysis), I explained how to perform a basic analysis of membership in an open cluster based on data downloaded from Gaia for a given region. In the following entries in this series, we will perform a much more rigorous membership analysis, using several unsupervised classification algorithms (DBSCAN, HDBSCAN, and GMM), comparing the results with each other and with available publications. The three methods are widely used in various articles addressing the problem of membership in open clusters. Other articles also use other supervised classification algorithms such as K-means, but I decided to discard them for the time being, as they require already labelled data for model training. For now, I will perform an analysis with three dimensions available in Gaia: parallax and proper motions in right ascension and declination. 
 
-Buscando literatura atopo que M37 é un cúmulo bastante estudiado e que me permite comparar os resultados obtidos e validar o meu proxecto. Na 
+Looking through the literature, I find that M37 is a well-studied cluster, which allows me to compare the results obtained and validate my project. 
 
-Coma nos artigos previos, os datos que usarei son descargados de [Gaia DR3](https://www.cosmos.esa.int/web/gaia/dr3) (Gaia Collaboration, Vallenari, A., et al. [(arXiv)](https://arxiv.org/abs/2208.00211) [(ADS)](https://ui.adsabs.harvard.edu/abs/2023A%26A...674A...1G/abstract)). A base de datos Gaia DR3 é a terceira release de datos e proporciona uns 1.81 mil millóns de obxectos, dos cales 1.47 mil millóns teñen os datos completos de astrometría e fotometría. En particular, os datos de paralaxe e movementos propios con altísima precisión serán usados aquí para a análise de pertenza.
+As in previous articles, the data I will use is downloaded from [Gaia DR3](https://www.cosmos.esa.int/web/gaia/dr3) (Gaia Collaboration, Vallenari, La., et al. [(arXiv)](https://arxiv.org/abs/2208.00211) [(ADS)](https://ui.adsabs.harvard.edu/abs/2023A%26La...674La...1G/abstract)). The Gaia DR3 database is the third data release and provides some 1.81 billion objects, of which 1.47 billion have complete astrometry and photometry data. In particular, the extremely high-precision parallax and proper motion data will be used here for membership analysis.
 
-Segundo a propia ESA os datos liberados como Gaia Early Data Release 3 (Gaia EDR3) comprenden:
+The description of some of the Gaia data is important to highlight at some point in this series of articles, and probably deserves an article of its own.
 
-- A solución astrométrica completa —posicións no ceo (α, δ), paralaxe e movemento propio— para ao redor de 1460 millóns (1,46 × 109) de fontes, cunha magnitude límite de aproximadamente G ≈ 21 e un límite de brillo de aproximadamente G ≈ 3. A solución astrométrica vai acompañada dalgúns novos indicadores de calidade, como RUWE, e descritores de imaxes de fontes.
-- A solución astrométrica completa realizouse como solución de 5 parámetros para 585 millóns de fontes e como solución de 6 parámetros para 882 millóns de fontes. Na solución de 6 parámetros, a cantidade axustada adicional é o denominado pseudocolor, que tivo que incluírse para as fontes sen información de cor de alta calidade. 
-- Ademais, solucións de dous parámetros (posicións no ceo (α, δ)) para ao redor de 344 millóns de fontes adicionais.
-- Magnitudes G para ao redor de 1806 millóns de fontes (co problema coñecido presente en EDR3 corrixido en Gaia DR3).
-- Magnitudes GBP e GRP para ao redor de 1540 millóns e 1550 millóns de fontes, respectivamente.
-
-Esta descripción dalgúns dos datos de Gaia era importante resaltala nalgún momento desta serie de artigos, e probablemente sexa merecedor dun artigo exclusivo.
-
-Segundo a literatura atopada ou a propia [páxina de SIMBAD para M37](https://simbad.cds.unistra.fr/simbad/sim-basic?Ident=ngc2099&submit=SIMBAD+search) os datos principáis do cúmulo son:
+According to the literature found or the SIMBAD page for M37 itself (https://simbad.cds.unistra.fr/simbad/sim-basic?Ident=ngc2099&submit=SIMBAD+search), the main data for the cluster are:
 
 | RA (α) | Dec (δ)  | pmra (μ_α) (mas/yr) | pmdec (μ_δ) (mas/yr) | parallax (π) (mas)|
 |:-------------:|:-------------:|:-------------:|:-------------:|:-------------:|
 | 88.074          | 32.545         | 1.924 ± 0.06        |-5.648 ± 0.05|0.666 ± 0.07|
 
-Destes datos partiremos para facer a descarga e filtrado de datos de Gaia e para comparar os datos obtidos como resultado.
+I will use this data to download and filter Gaia data and to compare the results obtained.
 
-Neste artigo compararemos 3 algoritmos de clasificación non supervisada (DBSCAN, HDBSCAN e GMM). Os 3 métodos son ampliamente utilizados en distintos artigos que abordan o problema da pertenza en cúmulos abertos. Outros artigos usan tamén outros algoritmos de clasificación supervisada como K-means, pero eu decidín descartalos polo momento, pois require de ter datos xa etiquetados para o entrenamento do modelo.
+## Downloading Gaia DR3 data
 
-## Descarga de datos de Gaia DR3
-
-Para a descarga de datos de Gaia DR3 sigo o mesmo método que xa usei anteriormente cos seguintes parámetros:
+To download Gaia DR3 data, I follow the same method I used previously with the following parameters:
 
 - `RA (α)`: 88.074
 - `Dec (δ)`: 32.545
 - `search_radius`:1.5º
 
-A elección de 1.5º pretende recuperar os datos non só de estrelas do centro do cúmulo, senon tamén as estrelas da coroa cercana e incluso algunha das estrelas evaporándose. Un radio máis grande podería ser adecuado para un estudo máis completo que inclúa as estructuras de marea do cúmulo. Non o farei neste momento, pero sí queda anotado como unha funcionalidad a selección do radio de búsqueda para incorporar en versións posteriores do código.
+By choosing 1.5º, I aim to recover data not only from stars in the centre of the cluster, but also from stars in the nearby corona and even some of the stars that are evaporating. An even larger radius might be appropriate for a more comprehensive study that includes the tidal structures of the cluster. I will not do this at this time, but it is noted as a feature to consider for inclusion in later versions of the code.
 
-Tamén se inclúen os filtros estándar sobre os datos de Gaia:
+Standard filters on the Gaia data are also included:
 
 ``` sql
 FROM gaiadr3.gaia_source
@@ -101,271 +93,203 @@ AND ruwe < 1.4
 AND phot_g_mean_mag < 20
 ```
 
-Con estes datos a consulta a Gaia devolve 53.109 estrelas, con esta estadística básica:
+With this data, the Gaia query returns 53,109 stars, with the following basic statistics:
 
-- `Número de estrelas`: 53109
-- `Paralaxe medio`: 0.84 ± 0.88 mas
-- `μ_α medio`: 1.19 ± 5.32 mas/yr
-- `μ_δ medio`: -4.55 ± 7.60 mas/yr
+- `Number of stars`: **53109**
+- `Mean Parallax`: **0.84 ± 0.88 mas**
+- `Mean μ_α`: **1.19 ± 5.32 mas/yr**
+- `Mean μ_δ`: **-4.55 ± 7.60 me las/yr**
 
-Aquí decido aplicar un filtro antes de aplicar os algoritmos de clasificación. Está bastante claro que nesta consulta hai moitas estrelas no mesmo campo de visión que non pertencen ao cúmulo. Pensemos agora que o cúmulo son precisamente estrelas que naceron na mesma zona e que se moven máis ou menos do mesmo xeito (con certa dispersión, por suposto). Para reducir o procesamento posterior e ir eliminando erros, vou filtrar os datos a partir do coñecemento que xa existe sobre o cúmulo M37. A valores de paralaxe e dos movementos propios dos membros do cúmulo teñen que estar nun valor cercano ao xa coñecido. Se filtramos os datos preto deses valores coñecidos e eliminamos os restantes, iremos afinando. ¿Cómo decidir os valores para filtrar? Considero o seguinte: cando decido un rango para o filtrado debo ter en conta que a Dispersión Total nos valores dos membros estará composta por:
+## Filtering the downloaded data
 
-<p style="text-align:center;">Dispersión total = dispersión intrínseca + erros de medida</p>
+The query returns more than 53,000 stars, a large number, and most of them probably do not belong to the cluster. Here I decided to apply a filter before applying the classification algorithms. It is quite clear that in this query there are many stars in the same field of view that do not belong to the cluster. Let us now consider that the cluster consists precisely of stars that were born in the same area and move in more or less the same way (with some dispersion, of course). To reduce subsequent processing and eliminate errors, I am going to filter the data based on existing knowledge about the M37 cluster: the parallax values and proper motions of the cluster members must be close to the already known value. We filter the data close to these known values and eliminate the rest, refining the process, reducing subsequent computational costs and reducing errors. How do we decide on the values to filter? I consider the following: when I decide on a range for filtering, I must take into account that the Total Dispersion of the members' values will be composed of:
 
-- **Dispersión instrínseca**: non todas as estrelas do cúmulo se moven igual. Hai unha dispersión de velocidades que se poden deber principalmente a interaccións gravitatorias internas entre sí, encontros cercanos entre dúas estrelas, estrelas binarias que crean movementos ao orbitar entre elas ou estrelas que *escapan* do cúmulo con velocidades anómalas. Estas dispersións nas velocidades pódese estimar aproximadamente en:
+<p style="text-align:center;">Total Dispersion = intrinsic dispersion + measurement errors</p>
 
-    - Cúmulos xoves (<100 Myr):  σ_v ~ 0.5-1.5 km/s
-    - Cúmulos intermedios (100-500 Myr): σ_v ~ 0.3-1.0 km/s
-    - Cúmulos vellos (>500 Myr): σ_v ~ 0.2-0.8 km/s
+- **Intrinsic dispersion**: not all stars in the cluster move at the same speed. There is a dispersion of velocities that may be due mainly to internal gravitational interactions between them, close encounters between two stars, binary stars that create movements as they orbit each other, or stars that *escape* from the cluster with anomalous velocities. These dispersions in velocities can be roughly estimated as:
 
-A idade estimada de M37 é de 500Myr, e escollerei un rango algo amplio. Se inclúo estrelas de máis, agardo que os algoritmos de clustering filtren as estrelas que non pertenzan. O rango fixado no filtro é de σ_v ~ 0.5-1.0 km/s, que se pode traducir a mas/yr coa fórmula:
+    - Young clusters (<100 Myr):  σ_v ~ 0.5-1.5 km/s
+    - Intermediate Clusters (100-500 Myr): σ_v ~ 0.3-1.0 km/s
+    - Old clusters (>500 Myr): σ_v ~ 0.2-0.8 km/s
 
-``` 
-μ [mas/yr] = (v_transversal [km/s] / d [pc]) × 211.09
-``` 
+    The estimated age of M37 is 500 Myr, and I will choose a somewhat wide range. If I include too many stars, I hope that the clustering algorithms will filter out the stars that do not belong. The range set in the filter is σ_v ~ 0.5–1.0 km/s, which can be translated to mas/yr using the formula:
 
-A distancia estimada de M37 é de 1500pc, có que os valores do rango serían:
+    ``` 
+    μ [mas/yr] = (v_transversal [km/s] / d [pc]) × 211.09
+    ``` 
 
-``` 
-σ_μ = (0.5 km/s / 1500 pc) × 211.09 = 0.070 mas/yr (mínimo)
-σ_μ = (1.0 km/s / 1500 pc) × 211.09 = 0.141 mas/yr (máximo)
-``` 
+    The estimated distance of M37 is 1500pc, so the range values would be:
 
-É dicir, engadiría unha dispersión intrínseca σ_μ ~0.07 - 0.14 mas/yr.
+    ``` 
+    σ_μ = (0.5 km/s / 1500 pc) × 211.09 = 0.070 mas/yr (mínimo)
+    σ_μ = (1.0 km/s / 1500 pc) × 211.09 = 0.141 mas/yr (máximo)
+    ``` 
+    That is, it would add an **intrinsic dispersion σ_μ ~0.07 - 0.14 mas/yr**.
 
-- **Erro de medida de Gaia**
-Os erros de medida de Gaia teñen que ver con varios factores: magnitude (estrelas máis débiles teñen maior erro), rexións do ceo con maior ou menor densidade de estrelas, número de observacións... Os erros típicos por magnitude son:
+- **Gaia measurement error**
+Gaia measurement errors are related to several factors: magnitude (fainter stars have greater error), regions of the sky with greater or lesser star density, number of observations... Typical errors by magnitude are:
+    
+    |G Magnitude | Error | Description|
+    |:----------:|:--------------:|:--------------:|
+    |G < 14| error_μ ~ 0.02-0.05 mas/yr | brightest stars|
+    |14 < G < 16| error_μ ~ 0.05-0.15 mas/yr | intermediate stars|
+    |16 < G < 18| error_μ ~ 0.15-0.50 mas/yr | weak stars|
 
+    Once again, I will choose a wide range: **σ_error ~ 0.10-0.25 mas/yr**, taking into account that the stars that contribute most to the cluster are in the range G=12-17.
 
-|Magnitude G | Erro | Descripción|
-|:----------:|:--------------:|:--------------:|
-|G < 14| error_μ ~ 0.02-0.05 mas/yr | estrelas brilantes|
-|14 < G < 16| error_μ ~ 0.05-0.15 mas/yr | estrelas intermedias|
-|16 < G < 18| error_μ ~ 0.15-0.50 mas/yr | estrelas débiles|
-
-De novo, vou escoller un rango amplio: σ_error ~ 0.10-0.25 mas/yr tendo en conta que as estrelas que máis contribúen ao cúmulo están no rango G=12-17. 
-
-Á hora de combinar erros:
+When combining errors:
 
 ```
-σ_total = √(σ_intrínseca² + σ_error²)
+σ_total = √(σ_intrinsec² + σ_error²)
 ```
-así que a dispersión total esperada é de ~0.2 - 0.3 mas/yr
+so **total expected dispersion is ~0.2 - 0.3 mas/yr**
 
-- **Marxe de seguridade**
-Na práctica hai outras causas que poden afectar á dispersión do cúmulo. Unha regla empírica robusta é usar ±3σ a ±5σ alrededor do valor esperado:
+- **Security margin**
+
+In practice, there are other causes that can affect the dispersion of the cluster. A robust rule of thumb is to use ±3σ to ±5σ around the expected value:
 ```
-±3σ → captura 99.7% dunha distribución normal
-±4σ → captura 99.99% 
-±5σ → moi conservador
+±3σ → captures 99.7% of a normal distribution
+±4σ → captures 99.99% 
+±5σ → very conservative
 ```
-Prefiro ser conservador, e usar 5σ, o que nos daría para μ_α e para μ_δ unha marxe de σ_seguridade 1.25mas/yr.
+    I prefer to be conservative and use 5σ, which would give us a safety margin of σ_safety 1.25mas/yr for μ_α and μ_δ.
 
-En global, quédome cun rango nos movementos propios de **rango μ_α de 0.7 a 3.0mas/yr e rango μ_δ de -7.0 a -4.0**
+Overall, I settle on a range for proper motions of **μ_α from 0.7 to 3.0mas/yr and μ_δ from -7.0 to -4.0**
 
-- **Límites na paralaxe**
-Para filtrar a paralaxe e quedarnos dentro duns límites razonables que inclúan as estrelas do cúmulo e minimicen as estrelas de campo, teño en conta os valores estimados na literatura. A paralaxe estimada de M37 é de 0.666mas (distancia ~1500pc). A dispersión típica dun cúmulo aberto está entre os 10-50pc, que a unha distancia aproximada de 1500pc correspondería a unha marxe de paralaxe de ±0.01-0.05 mas. Engadimos unha marxe de erro na medida de Gaia (~0.05-0.10mas). Así que sendo conservadores, para non excluir estrelas do cúmulo no filtro, establezo un **rango na paralaxe de 0.50-0.85mas**. 
+- **Parallax limits**
+To filter the parallax and stay within reasonable limits that include the stars in the cluster and minimise field stars, I take into account the values estimated in the literature. The estimated parallax of M37 is 0.666mas (distance ~1500pc). The typical dispersion of an open cluster is between 10-50pc, which at an approximate distance of 1500pc would correspond to a parallax margin of ±0.01-0.05 mas. We add a margin of error in the Gaia measurement (~0.05-0.10mas). So, to be conservative, in order not to exclude stars from the cluster in the filter, I set a **parallax range of 0.50-0.85mas**.
 
-Ao aplicar este límite sobre os datos descargados de Gaia, obteño:
+Applying these limits to the data downloaded from Gaia, I obtain:
 
-- `Número de estrelas`: 3377
-- `Paralaxe medio`: 0.67 ± 0.08 mas
-- `μ_α medio`: 1.86 ± 0.45 mas/yr
-- `μ_δ medio`: -5.50 ± 0.62 mas/yr
+    - `Number of stars`: **3377**
+    - `Mean Parallax`: **0.67 ± 0.08 mas**
+    - `Mean μ_α`: **1.86 ± 0.45 mas/yr**
+    - `Mean μ_δ`: **-5.50 ± 0.62 mas/yr**
 
-A partir de ahí fago unha normalización dos datos, para levalos todos a unha escala similar e que uns valores máis altos nun dos parámetros non dominen a análise.
+As a final step, I normalise the data to bring it all to a similar scale so that higher values in one of the parameters do not dominate the analysis.
 
-## Análise de pertenencia con DBSCAN
+## Membership analysis with DBSCAN
 
-DBSCAN (Density-Based Spatial Clustering of Applications with Noise) é un algoritmo que agrupa puntos baseándose na súa densidade local. O algoritmo ten dous parámetros principais:
-- `eps`: a distancia máxima entre dous puntos para consideralos veciños.
-- `min_samples`: o número mínimo de puntos necesarios para formar un grupo denso.
+DBSCAN (Density-Based Spatial Clustering of Applications with Noise) is an algorithm that clusters points based on their local density. The algorithm has two main parameters:
+- `eps`: the maximum distance between two points for them to be considered neighbours.
+- `min_samples`: the minimum number of points required to form a dense cluster.
 
-DBSCAN funciona como si esparcieras semillas en un campo y solo consideraras "grupos" aquellas zonas donde caen muchas semillas juntas. El parámetro eps define qué tan juntas deben estar las semillas para considerarlas vecinas, mientras que min_samples determina cuántas semillas necesitas en un área para considerar que hay un "grupo real" y no solo casualidad. La gran ventaja es que las estrellas aisladas (del campo) se marcan explícitamente como ruido (etiqueta -1), lo cual tiene mucho sentido astrofísico.
+DBSCAN is particularly good for clusters because:
+1. It does not assume that clusters are spherical in shape.
+2. It can identify points as ‘noise’ (outliers)
+3. It does not need to know in advance how many clusters there are
 
+The truth is that I have not yet found a method to decide what the optimal values are for each cluster, because they do affect the result of the algorithm, and they do not seem to behave the same in each cluster. In my case, after several tests, I have settled on these values:
 
-DBSCAN é especialmente bo para cúmulos porque:
-1. Non asume que os grupos teñen forma esférica
-2. Pode identificar puntos como "ruído" (estrelas do campo)
-3. Non necesita saber de antemán cantos cúmulos hai
+- `eps`: **0.3**
+- `min_samples`: **20**
 
-O certo é que non atopei polo momento un método para decidir cales son os valores óptimos para cada cúmulo, porque sí afectan ao resultado do algoritmo, e non parecen comportarse igual en cada cúmulo. Para o meu caso, despois de varias probas quedo con estes valores:
+With this values I get the following results:
 
-- `eps`: 0.3
-- `min_samples`: 20
+- `Number of clusters identified`: **1**
+- `Stars classified as noise (field)`: **1773**
+- `Stars classified in main cluster` **1689** 
+- `Parallax`: **0.67±0.05mas**
+- `μ_α`: **1.88±0.15mas/yr**
+- `μ_δ`: **-5.62±0.15mas/yr**
 
-Con estes valores obteño os seguintes resultados:
+These values are remarkably consistent with other studies and with SIMBAD's own data. Thus, [Cantat-Gaudin et al. (2018)](https://www.aanda.org/articles/aa/full_html/2018/10/aa33476-18/aa33476-18.html) obtain `Parallax`: **0.66mas**, `μ_α`:**1.92mas/yr** and `μ_δ`: **-5.64**. [M Noormohammadi, M Khakian Ghomi, A Javadi (2024)](https://doi.org/10.1093/mnras/stae1448) obtain `Parallax`: **0.67 ± 0.08mas**, `μ_α`:**1.87 ± 0.09mas/yr** and `μ_δ`: **−5.62 ± 0.06mas/yr** using a combination of DBSCAN and GMM.
 
-- Número de cúmulos identificados: 1
-- Estrelas clasificadas como ruido (campo): 1773
-- Estrelas en cúmulos: 1689
-- O cúmulo principal ten 1689 estrelas
-- Paralaxe: 0.67±0.05mas
-- μ_α*: 1.88±0.15mas/yr
-- μ_δ: -5.62±0.15mas/yr
+## Analysis of results
 
-Eses valores son extraordinariamente coincidentes con outros estudios (XXXXXXXXXXX) e cos propios datos de SIMBAD. Algunhas gráficas para ver o resultado:
+I will now analyse the results obtained, which will allow me to learn in detail many of the physical concepts behind them.
 
-![Resultados DBSCAN](:dbscan_results_M37.png)
+I will start with some graphs to see the results:
 
-Estes 4 gráficos permiten verificar se a clasificación é consistente co coñecemento actual do cúmulo ou se hai algún dato que faga replantexar os parámetros do algoritmo.
+![DBSCAN Results](:dbscan_results_M37.png)
 
-1. **Diagrama de movementos propios**
-O diagrama de movementos propios é quizáis o máis importante: as estrelas do cúmulo naceron xuntas e viaxan xuntas polo espacio, polo que formarán un grupo compacto neste diagrama. O campo estelar está composto por estrelas de diferentes idades, distancias e órbitas galácticas, polo que aparecerá espallado. A separación clara entre estes dous grupos é a que fai posible a análise de pertenza.
+These four graphs allow us to verify whether the classification is consistent with current knowledge of the cluster or whether there is any data that would cause us to rethink the algorithm's parameters.
 
-No diagrama xerado vese claramente como DBSCAN identificou correctamente o núclo do cúmulo e sen contaminiación significativa no espacio cinemático.
-O cúmulo en vermello é moi compacto centrado en (μ_α* ≈ 1.9, μ_δ ≈ -5.6). As estrelas de campo en gris están espalladas por todo o espacio. Non hai solapamento entre ambos.
+#### 1. **Proper motion diagram**
+The proper motion diagram is perhaps the most important: the stars in the cluster were born together and travel together through space, so they will form a compact group in this diagram. The stellar field is composed of stars of different ages, distances, and galactic orbits, so it will appear scattered. The clear separation between these two groups is what makes membership analysis possible. 
+The generated diagram clearly shows how DBSCAN correctly identified the core of the cluster without significant contamination in the kinematic space. The cluster in red is very compact, centred at (μ_α* ≈ 1.9, μ_δ ≈ -5.6). The field stars in grey are scattered throughout the space. There is no overlap between the two.
 
-2. **Distribución espacial**
-A distribución que se amosa na gráfica xerada é consistente co agardado: un núcleo central centrado en ~(88.0°, 32.7°) e radio ~0.3-0.4 grados. Non se aprecian subestructuras nen múltiples núcleos.
+#### 2. *Spatial distribution**
+The distribution shown in the generated graph is consistent with what is expected: a central core centred at ≈(88.0°, 32.7°) and a radius of ≈0.3-0.4 degrees. No substructures or multiple cores are apparent.
 
-3. **Diagrama Paralaxe-Magnitude**
-Neste diagrama amósase a relación entre a magnitude absoluta dos membros vs distancia (paralaxe). Dado que as estrelas do cúmulo están á mesma distancia, agardamos ver unha columna vertical centrada en 0.67mas con estrelas de todas as magnitudes. Na parte superior estarían as estrelas máis brilantes (xigantes, estrelas masivas) e na parte inferior as estrelas máis débiles (enanas de baixa masa).
+#### 3. **Parallax-Magnitude Diagram**
+This diagram shows the relationship between the absolute magnitude of the members vs. distance (parallax). Since the stars in the cluster are at the same distance, we expect to see a vertical column centred at 0.67mas with es
 
-Os datos observados son de novo coherentes co agardado: hai unha columna centrada en 0.67mas cun andho de ±0.03-0.04 mas aproximadamente. A partir destes datos poderíase obter a profundidade do cúmulo, que pode estar no entorno dos 50pc.
+#### 4. *Parallax histogram**
+This diagram shows the number of stars versus parallax. I would expect to see a Gaussian distribution centred at 0.67 mas, as the stars in the cluster should all be at approximately the same distance, with a higher concentration in the centre of the cluster.
+What we see is a central peak at ≈0.67mas, with a height of ≈155 stars/bin. The shape is Gaussian and the width at half height is ≈0.04mas (0.65-0.69 mas).
 
-4. **Histograma de paralaxes**
-Este diagrama amosa o nº de estrelas vs paralaxe. Agardaríamos ter unha distribución gaussiana centrada en 0.67mas, pois as estrelas do cúmulo deberían estar todas á mesma distancia aproximadamente, e con máis concentración no centro do cúmulo.
+#### 5. **Colour Magnitude Diagram (CMD)**
+This diagram is key to the entire analysis: the colour magnitude diagram. In this diagram, we represent the stars identified as members of the cluster by showing their absolute magnitude (luminosity) against their spectral type. The luminosity, or absolute magnitude, is data that we obtain directly from Gaia's `phot_g_mean_mag` field (absolute magnitude in the G band). On the x-axis of the diagram, we use bp-rp, obtained from Gaia's `phot_bp_mean_mag` and `phot_rp_mean_mag` fields (absolute magnitudes in the rp and bp bands). A small BP-RP indicates that it is a blue, very hot star (≈10,000K), while a large BP-RP indicates that it is a blue, cool star (≈3,000K).
 
-O que vemos é un pico central en ~0.67 mas, cunha altura de ~155 estrellas/bin. A forma é unha gaussiana e o ancho a media altura é de ~0.04 mas (0.65-0.69 mas).
+![CMD DBSCAN diagram](:cmd_dbscan_M37.png)
 
+This diagram provides a wealth of information, which I will try to explain in several points:
 
+5.1. **Narrow and continuous main sequence**
+The main sequence line appears correct, from BP-RP ≈ 0.5 and G ≈ 12 (corresponding to very massive, hot, blue stars) to BP-RP ≈ 2.0 and G ≈ 18 (low-mass, cool, red dwarfs). The trajectory does not show any jumps, and it is also very narrow (low dispersion). This low dispersion indicates that the identified stars are of the same age and metallicity. Why?
 
-![O meu Dobson de 10 pulgadas](:dobson.png)
+Here I will introduce several concepts. The position of a star in the CMD diagram basically depends on its mass. And the mass of the star determines its duration in the main sequence: more massive stars, due to greater gravitational pressure in the core, burn hydrogen at a faster rate than less massive stars. This duration is determined by the rate at which the fuel burns. The life of a star on the main sequence can be approximated with this formula: t = 10¹⁰ (M/M☉)⁻².⁵.
 
-M37 é o cúmulo máis rico da constelación de Auriga, con outros dous membros moi interesantes, M36 e M38. Según algunhas fontes é coñecido como "Cúmulo da sal e pementa". Segundo algúns estudios está a aproximadamente 4.500 anos-luz de distancia. A luz que vin esta fin de semana saiu máis ou menos cando se estaba a levantar o [Dolmen de Dombate](https://concello-cabana.es/es/elementor-2454/), a catedral do megalitismo no noroeste de España, e un dos meus lugares predilectos.
+|Mass|Time in MS|Description|
+|:----------:|:----------:|:----------|
+| 25 M☉    |  ~7 Myr         |  Very massive, very short life    |
+| 15 M☉    |  ~11 Myr        |  Supergiant                    |
+| 10 M☉    |  ~20 Myr        |  Type O/B stars              |
+|  8 M☉    |  ~35 Myr        |  Type B                          |
+|  6 M☉    |  ~65 Myr        |  Type B/A                        |
+|  5 M☉    |  ~95 Myr        |  Type A                          |
+|  4 M☉    |  ~180 Myr       |  Type A/F                        |
+|  3.5 M☉  |  ~270 Myr       |  Type F                          |
+|  3 M☉    |  ~400 Myr       |  Type F                          |
+|  2.5 M☉  |  ~630 Myr       |  Type F/G                        |
+|  2.2 M☉  |  ~850 Myr       |  Type G                          |
+|  2.0 M☉  |  ~1,100 Myr     |  Type G                          |
+|  1.7 M☉  |  ~1,700 Myr     |  Type G                          |
+|  1.5 M☉  |  ~2,400 Myr     |  Type G/K                        |
+|  1.2 M☉  |  ~4,900 Myr     |  Type K                          |
+|  **1.0 M☉**  |  **~10,000 Myr**    |  **Sun (Type G2V)**                  |
+|  0.9 M☉  |  ~14,000 Myr    |  Type K                          |
+|  0.8 M☉  |  ~21,000 Myr    |  Type K                          |
+|  0.7 M☉  |  ~32,000 Myr    |  Type K/M                        |
+|  0.5 M☉  |  ~80,000 Myr    |  Type M                          |
+|  0.3 M☉  |  ~200,000 Myr   |  Dwarf M                         |
+|  0.1 M☉  |  >1,000,000 Myr |  Late Dwarf M                  |
 
-### Orixe e formación dos cúmulos abertos
 
-Compre explicar brévemente a orixe dun cúmulo aberto. Un cúmulo aberto é un grupo de estrelas que se formaron xuntas a partir da mesma nube molecular de gas e polvo. Coñecense tamén como 'cúmulos galácticos' porque atópanse no plano das galaxias espiráis, como a nosa Vía Láctea, onde a formación estelar é máis activa. As estrelas dos cúmulos abertos soen ser xóvenes (< 1.000 millóns de anos de idade), soen estar compostos dende poucas decenas ata uns poucos miles de estrelas. A súa forma é irregular, e as súas estrelas están ligadas gravitatoriamente.
+During this phase, the star remains in an almost fixed position in the CMD. When it exhausts its hydrogen, the star “moves” upwards and to the right in the diagram, towards the red giants. 
 
-O proceso de formación dun cúmulo aberto empeza cunha gran nube molecular de gas e pó. Dentro desta nebulosa, a gravidade provoca que algunhas zonas se contraigan e colapsen. A medida que estas rexións se comprimen, a presión e a temperatura aumentan, o que desencadena as reaccións de fusión nuclear e o nacemento de novas estrelas. As estrelas recén formadas emiten unha gran cantidade de radiación e ventos estelares que empuxan o gas e o pó restantes cara o exterior. Este proceso disipa a nebulosa de orixen, deixando atrás o grupo de estrelas xóvenes que resultan visibles como un cúmulo aberto.
+If stars were not all born at the same time, we would see that in the range of massive stars (between 3 and 4 M☉) there would be some that had already left the main sequence and other younger ones that would still be in the main sequence: some would have already consumed their fuel, and others would still be in that phase. But we do not see that; in the upper left part of the diagram, all the stars have moved towards the red giant phase.
 
-Debido a que as estrelas dun cúmulo abierto non están tan fortemente unidas pola gravidade como nos cúmulos globulares, a interacción gravitatoria con outras estrelas, nubes de gas ou o propio centro da galaxia fai que, co tempo, o cúmulo se disperse e as súas estrelas se separen.
+The similar **metallicity** of the stars identified as belonging to the cluster would also be explained by this low dispersion. When we talk about metallicity in stellar composition, we always refer to the presence of elements heavier than helium (Fe, C, O, etc.). Different metallicity has effects on opacity: the higher the metallicity, the greater the opacity and therefore the cooler the temperature. This implies that two stars of the same mass and age would be in the same vertical position but not horizontal: the one with higher metallicity would be redder. In the diagram, we would see great horizontal dispersion. It also has an effect on the rate at which material is consumed in the core, which would result in different luminosities. 
 
-### Análise de pertenza
+The stars in the cluster formed from the **same molecular cloud** with the same chemical composition, and the chemical composition is virtually identical for all stars.
 
-A análise de pertenza busca separar qué estrelas que realmente pertencen ao cúmulo das estrelas de campo que só están na mesma liña de visión 
-por casualidade. As estrelas do cúmulo son estrelas que naceron xuntas, móvense xuntas e estan á mesma distancia. As estrelas de campo están a diferentes distancias e móvense aleatoriamente; non parecen estar relacionadas entre sí nin co resto das estrelas do cúmulo. Tendo isto en conta, usaremos 3 parámetros para facer a análise de pertenza:
+5.2. **Visible turn-off**
 
-- `pmRA` e `pmDEC` (**movementos propios**): as estrelas do cúmulo teñen movementos propios moi similares porque naceron da mesma nube molecular e manteñen velocidades similares, o cúmulo móvese coma un todo pola Galaxia.
-- `paralaxe`: as estrelas do cúmulo están á mesma distancia polo que teñen paralaxes similares.
+The turn-off is key information that can be extracted from the CMD diagram, as it will provide the age of the cluster. To understand why, let's first look at the diagram. The diagonal main sequence is clear. There comes a point where it curves to the right, at BP-RP~0.4-0.5 and G~10.5-11 approximately. That is the turn-off point, and it can be objectively defined as the bluest (lowest BP-RP) and brightest (lowest G) point on the main sequence before it curves towards the giant branch.
 
-Para facer a análise usando algoritmos de clustering, podemos escoller entre varios. Un que usei no pasado en entornos de datos empresariais é [K-means](https://www.datacamp.com/es/tutorial/k-means-clustering-python). Outro que se usa en este tipo de análise é [DBSCAN](https://www.datacamp.com/es/tutorial/dbscan-clustering-algorithm). Vou usar este último por varios motivos: o principal diría que é que DBSCAN non precisa saber a priori cántos grupos ten que facer, se non que o descubre automáticamente. Dado que o propósito desta entrada é amosar unha posible aplicación dos datos de Gaia para analizar cúmulos abertos, non profundizarei moito máis comparando con outros métodos, ou mellorando a implementación deste algoritmo (algo que espero ir facendo máis adiante). Fai uns anos nun proxecto para unha empresa probei [PyCaret](https://pycaret.org/) para validar o resultado con distintos algoritmos, facer o axuste fino dos parámetros e orquestrar todo o pipeline en só 14 liñas de código. Espero revisalo próximamente neste contexto.
+The turn-off marks the point where stars are **exhausting the hydrogen** in their core and begin to evolve off the main sequence. Its position will tell us the luminosity, temperature and therefore mass of the stars that are in that phase. With the table above, we know how old those stars are, because we know the age at which they end their life on the main sequence.
 
+To establish the age, we will have to compare the CMD diagram with isochrones from stellar models, curves from the CMD diagram for different ages of the cluster. There are several models based on isochrones (PARSEC, MIST, etc.), and in future posts I will investigate them and how to estimate the age of the cluster.
 
-### Descripción do procesado
+For now, what we do see is that there is a visible turn-off point in the diagram.
 
-O caderno Jupyter está no [repositorio](https://github.com/SergioPereiraLema/Open-Clusters-Analytics/) do proxecto.
+5.3. **Clear red giant branch**
 
-## Configuración do entorno
+In the CMD diagram, we also see the red giant branch in BP-RP between 1.5 and 1.8 and G between approximately 10-11. There will be about 30-35 stars in that range. These are stars that have already passed the turn-off point and are now evolving into red giants. They are cooler stars but still very bright. The fact that this branch is visible confirms that the cluster has reached an age sufficient for the most massive stars to have passed this point.
 
-Realizarei o desenrolo usando Python no mesmo entorno virtual que creei na primeira entrada. Só hai que engadir a popular librería [scikit-learn](https://scikit-learn.org/).
+5.4. **Field vs. Cluster Comparison**
 
+When comparing the stars in the cluster with the field stars in the diagram, there are also differences. The field stars are more scattered, and we see that there are less massive stars in the branch leading to the giants and that the dispersion in the main sequence is higher, suggesting multiple ages, metallicities, and distances.
 
-``` bash
-conda activate cluster_env
-pip install scikit-learn
-```
+![Annotated CMD](:cmd_dbscan_M37_annotated.png)
 
-## Obtención de datos
+### Conclusion
 
-### Datos básicos dende SIMBAD
+In conclusion to the entire project, I can say that DBSCAN correctly identified the M37 cluster. This will be confirmed with analyses using the other two methods (HDBSCAN and GMM). Once the members have been confirmed, I will begin studies of the cluster's age, initial mass function analysis, unresolved binaries, and metallicity determination.
 
-Vou reaproveitar parte do código que fixen no primeiro caderno Jupyter. Primeiro, recupero os datos básicos (coordenadas, tamaño...) en [SIMBAD](https://simbad.u-strasbg.fr/simbad/). Con este resultado xa temos os datos necesarios para consultar en Gaia (coordenadas e tamaño). Ao executar a consulta en SIMBAD obteño:
+Personally, this process contributed greatly to the project's objectives. To interpret the results, I had to read scientific publications on membership analysis, academic literature on star formation and evolution, and review concepts such as luminosity, temperature, mass, nuclear fusion... It was really rewarding. 
 
-- `Name`: M 37
-- `Type`: OpC
-- `RA`: 88.077300º
-- `Dec`: 32.543400º
-- `PmRA`: 1.924 (mas/yr)
-- `PmDec`: -5.648 (mas/yr)
-- `galdim_majaxis`: 19.299999237060547 (arcmin)
-- `galdim_minaxis`: 19.299999237060547 (arcmin)
-- `Radius`: 9.649999618530273 (arcmin)
-- `Parallax`: 0.666 (mas)
-
-Xa teño as coordenadas e o tamaño. Con iso imos lanzar a consulta á base de datos DR3 de Gaia. Hai que ter en conta neste momento que o tamaño máximo que estou collendo é o que devolve SIMBAD. Quizáis debería ampliar un pouco máis o radio de búsqueda para non deixar fora da consulta estrelas do cúmulo. O campo aparente que vin no ocular do telescopio sí me pareceu superior a 20 minutos de arco.
-
-### Consulta á base de datos DR3 de Gaia
-
-Agora imos conectarnos á base de datos de Gaia e lanzar unha consulta a partir dos parámetros obtidos. Nesta ocasión aproveito para facer unha función que espero ir pulindo e reaproveitando máis adiante. 
-
-A consulta [ADQL](https://www.cosmos.esa.int/web/gaia-users/archive/writing-queries) xa inclúe varios filtros de calidade:
-
-- `parallax > 0`: recupero só estrelas con paralaxe válida
-- `parallax/parallax_error > 5`: filtro só resultados con erro na paralaxe baixo
-- `pmra_error IS NOT NULL` e `pmdec_error IS NOT NULL` : estrelas con erro reportado nos movementos propios
-- `phot_g_mean_mag < 20`: estrellas máis brilantes de magnitude 20
-- `ruwe < 1.4`: estrellas con Renormalised Unit Weight Error <1.4 que garantiza eliminar estrelas binarias, astrometría aceptable...
-
-E lanzo a consulta de forma sinxela, reaproveitando o código anterior. Esta consulta devolve un obxecto `astropy.table.Table`, que transformo nun Pandas Dataframe co método to_pandas().
-
-A consulta devolve 1.783 estrelas nese campo de visión.
-
-### Algunhas visualizacións básicas
-
-Agora fago algunha gráfica interesante que servirán en futuras análises dos cúmulos. Polo momento só de xeito ilustrativo:
-
-- **mapa celeste**
-- **diagrama de movementos propios**
-- **histograma de paralaxes**
-- **diagrama color-magnitude**
-
-![diagramas básicos](:basic_diagrams.png)
-
-Tamén estiven a probar a conversión dos parámetros BP e RP a cores RGB, de xeito que poderíamos pintar a cor aproximada de cada estrela nestes gráficos: 
-
-![diagramas básicos a cor](:basic_diagrams_color.png)
-
-Na segunda parte profundizarei na información que se pode extraer de cada un destes gráficos. 
-
-### Análise de membresía
-
-Aquí ven a parte importante do proxecto de hoxe: usar algoritmos de clustering para determinar cales son as estrelas que pertencen ao cúmulo. Como comentaba na introducción, só probarei agora o algoritmo [DBSCAN](https://www.datacamp.com/es/tutorial/dbscan-clustering-algorithm). 
-
-Creo unha función para aplicar o algoritmo. Os parámetros que vou usar son os movementos propios e a paralaxe. Como primeira aproximación creo que son os datos máis importantes e centrareime neles.
-
-Seguindo os pasos habituais na aplicacións de algoritmos de clasificación, aplico StandardScaler para *escalar* os datos e evitar que un dos parámetros inflúa máis que o outro por ter valores maiores. Logo aplico o algoritmo sobre os datos. Usei uns parámetros que atopei en algunha lectura, pero que requerirían un fine tunning para obter os mellores resultados. 
-
-A saída final deste bloque de código é unha nova columna no DataFrame indicando se cada unha das estrelas descargadas é ou non é membro do cúmulo principal. E con isto obteño 1.465 estrelas pertencentes ao cúmulo e 318 identificadas como ruido. 
-
-Na seguinte entrada buscarei literatura sobre outras análises deste cúmulo para comparar e ver se a miña aproximación semella correcta.
-
-### Resultados
-
-Agora temos un DataFrame con datos das estrelas pertencentes ao cúmulo con varios parámetros, dos que podemos sacar alguns resultados:
-
-- `RA do centro`: 88.074º
-- `DEC do centro`: 32.542º
-- `mean pmRA`: 1.49 ± 0.89 mas/ano
-- `mean pmDEC`: -4.63 ± 1.74 mas/ano
-- `mean Parallax`: 0.61 ± 0.016
-- `mean distance`:  ~ 1.639 pc
-
-E finalmente, engadimos as mesmas visualizacións anteriores, pero marcando cales son as estrelas membros do cúmulo.
-
-![diagramas básicos con pertenza](:basic_diagrams_membership.png)
-
-## Conclusións e seguintes pasos
-
-O presente exercició é só outra introducción para aprender a descargar e facer análise de datos dun cúmulo aberto cos datos dispoñibles en Gaia DR3. Este tipo de exercicios axudanme no proceso de descubrir todos os datos dispoñibles na base de datos de Gaia, qué atributos son os máis relevantes no estudo dos cúmulos abertos e cómo procesalos. Tamén, aínda que será descrito na parte II deste artigo, descubrir a literatura científica sobre este e outros cúmulos, aprender sobre os parámetros físicos que se teñen estudiado, e cales son as liñas de investigación abertas neste campo. 
-
-Con todo isto agardo ir avanzando en adquirir unha base sólida para profundizar nestes eido e desenrolar análises máis complexas. 
-
-Sobre a análise de M37, quedan abertos aínda bastantes puntos nos que espero traballar próximamente:
-
-- Atopar literatura científica coa que poder comparar os resultados.
-- Realizar fine tunning dos parámetros usados no algoritmo.
-- Comparar os resultados con outros algoritmos para realizar a análise de pertenza.
-
-Na seguinte entrada tentarei facer esta investigación, comparar os resultados obtidos con outros estudios publicados, e avanzar na interpretación física dos gráficos e da información relevante que se pode obter.
-
-
-
-
-
-
-
-
+The next two entries will repeat this process with the other two methods, and finally, a comparative analysis of the three with studies already published on this same cluster.
 

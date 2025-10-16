@@ -1,7 +1,7 @@
 ---
 # multilingual page pair id, this must pair with translations of this page. (This name must be unique)
 lng_pair: id_blog_3
-title: Análise de pertenza do cúmulo M37 - II
+title: Análisis de pertenencia del cúmulo abierto M37 - II DBSCAN
 
 # post specific
 # if not specified, .name will be used from _data/owner/[language].yml
